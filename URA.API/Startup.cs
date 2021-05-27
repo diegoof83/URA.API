@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using URA.API.Domain.Repositories;
+using URA.API.Domain.Models;
 using URA.API.Domain.Services;
 using URA.API.Persistence.Contexts;
 using URA.API.Persistence.Repositories;
@@ -33,10 +33,9 @@ namespace URA.API
         {
             services.AddDbContext<AppDbContext>(x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();
-
-
-            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IBaseRepository<User>, UserRepository>();
             services.AddScoped<IUserService, UserService>();
+
             //services.AddSwaggerGen(c =>
             //{
             //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "URA.API", Version = "v1" });

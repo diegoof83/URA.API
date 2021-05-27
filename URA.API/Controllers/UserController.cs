@@ -20,9 +20,9 @@ namespace URA.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<User>> GetAllAsync() 
+        public IEnumerable<User> GetAll() 
         {
-            var users = await _userService.ListAsync();
+            var users = _userService.GetAll();
 
             return users;
         }
