@@ -10,11 +10,11 @@ using URA.API.Persistence.Repositories;
 
 namespace URA.API.Services
 {
-    public class UserService : IUserService
+    public class UsersService : IUsersService
     {
         private IBaseRepository<User> _repository;
 
-        public UserService(IBaseRepository<User> repository)
+        public UsersService(IBaseRepository<User> repository)
         {
             _repository = repository;
         }
@@ -24,19 +24,39 @@ namespace URA.API.Services
             return _repository.GetAll();
         }
 
-        public IEnumerable<User> GetByFilter(UserFilter userFilter)
+        public User GetById(long id)
         {
-            Expression<Func<User, bool>> isEmailMatched = entity => entity.Email.Contains(userFilter.Email);
-            Expression<Func<User, bool>> isNameMatched = entity => entity.Name.Contains(userFilter.Name);
+            return _repository.GetById(id);
+        }
+
+        public IEnumerable<User> GetByFilter(UserFilter filter)
+        {
+            Expression<Func<User, bool>> isEmailMatched = entity => entity.Email.Contains(filter.Email);
+            Expression<Func<User, bool>> isNameMatched = entity => entity.FirstName.Contains(filter.Name);
 
             Expression orExpr = Expression.Or(isEmailMatched, isNameMatched);
 
             return Filter(orExpr);
-        }
+        }       
 
         private IEnumerable<User> Filter(Expression expression)
         {
             return _repository.GetByFilter(Expression.Lambda<Func<User,bool>>(expression).Compile());
+        }
+
+        public User Create(User entity)
+        {
+            return _repository.Create(entity);
+        }
+
+        public User Update(User entity)
+        {
+            return _repository.Update(entity);
+        }
+
+        public void Delete(User entity)
+        {
+            _repository.Delete(entity);
         }
     }
 }

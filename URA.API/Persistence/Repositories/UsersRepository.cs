@@ -8,9 +8,9 @@ using URA.API.Persistence.Contexts;
 
 namespace URA.API.Persistence.Repositories
 {
-    public class UserRepository : BaseRepository<User>
+    public class UsersRepository : BaseRepository<User>
     {
-        public UserRepository(AppDbContext dbContext) : base(dbContext)
+        public UsersRepository(AppDbContext dbContext) : base(dbContext)
         {
         }
         protected override DbSet<User> Collection => _db.Users;

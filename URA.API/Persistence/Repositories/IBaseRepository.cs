@@ -11,10 +11,14 @@ namespace URA.API.Persistence.Repositories
     {
         public IEnumerable<T> GetAll();
 
-        public T GetById(long id);
+        public T GetById(long id);        
+
+        public IEnumerable<T> GetByFilter(Func<T, bool> onFilter);
 
         public T Create(T entity);
 
-        public IEnumerable<T> GetByFilter(Func<T, bool> onFilter);
+        public T Update(T entity);
+
+        public void Delete(T entity);
     }
 }

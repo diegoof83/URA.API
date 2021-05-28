@@ -12,7 +12,11 @@ namespace URA.API.Domain.Models
     {
         [Required]
         [MaxLength(30)]
-        public string Name { get; set; }
+        public string FirstName { get; set; }
+
+        [Required]
+        [MaxLength(30)]
+        public string LastName { get; set; }
 
         [Required]
         [MaxLength(50)]
@@ -21,6 +25,5 @@ namespace URA.API.Domain.Models
         [Required]
         [MaxLength(15)]
         public string Password { get; set; }
-        
     }
 }

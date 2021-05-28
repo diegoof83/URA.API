@@ -27,7 +27,7 @@ namespace URA.API.Persistence.Repositories
 
         public T GetById(long id)
         {
-            return Collection.Where(entity => entity.Id == id).FirstOrDefault(null);
+            return Collection.FirstOrDefault(entity => entity.Id == id);
         }
         
         public IEnumerable<T> GetByFilter(Func<T, bool> onFilter)
@@ -37,7 +37,24 @@ namespace URA.API.Persistence.Repositories
 
         public T Create(T entity)
         {
-            return Collection.Add(entity).Entity;
+            entity = Collection.Add(entity).Entity;
+            _db.SaveChanges();
+
+            return entity;
+        }
+
+        public T Update(T entity)
+        {
+            entity = Collection.Update(entity).Entity;
+            _db.SaveChanges();
+
+            return entity;
+        }
+
+        public void Delete(T entity)
+        {
+            Collection.Remove(entity);
+            _db.SaveChanges();
         }
     }
 }

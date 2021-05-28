@@ -33,8 +33,8 @@ namespace URA.API
         {
             services.AddDbContext<AppDbContext>(x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();
-            services.AddScoped<IBaseRepository<User>, UserRepository>();
-            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IBaseRepository<User>, UsersRepository>();
+            services.AddScoped<IUsersService, UsersService>();
 
             //services.AddSwaggerGen(c =>
             //{
