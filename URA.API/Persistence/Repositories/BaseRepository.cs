@@ -22,22 +22,22 @@ namespace URA.API.Persistence.Repositories
 
         public IEnumerable<T> GetAll()
         {
-            return this.Collection.AsEnumerable<T>();
+            return Collection.AsEnumerable<T>();
         }
 
         public T GetById(long id)
         {
             return Collection.Where(entity => entity.Id == id).FirstOrDefault(null);
         }
-
-        public T Create(T entity)
-        {
-            return this.Collection.Add(entity).Entity;
-        }
-
+        
         public IEnumerable<T> GetByFilter(Func<T, bool> onFilter)
         {
             return Collection.Where(onFilter).AsEnumerable();
+        }
+
+        public T Create(T entity)
+        {
+            return Collection.Add(entity).Entity;
         }
     }
 }

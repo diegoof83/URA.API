@@ -9,7 +9,7 @@ using URA.API.Domain.Services;
 namespace URA.API.Controllers
 {
     [ApiController]
-    [Route("/api/[controler]")]
+    [Route("api/ura/[controller]")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
