@@ -94,7 +94,7 @@ namespace URA.API.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<IEnumerable<User>> Delete(int id)
+        public ActionResult Delete(long id)
         {
             var entity = _service.GetById(id);
 
@@ -103,7 +103,7 @@ namespace URA.API.Controllers
 
             _service.Delete(entity);
 
-            return NoContent();
+            return Ok();
         }
     }
 }
