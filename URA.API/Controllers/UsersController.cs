@@ -38,7 +38,7 @@ namespace URA.API.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<User> Get(long id)
+        public ActionResult<User> GetById(long id)
         {
             var entity = _service.GetById(id);
 
