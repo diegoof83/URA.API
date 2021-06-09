@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using Xunit;
 
 namespace URA.API.TESTS
@@ -7,12 +8,13 @@ namespace URA.API.TESTS
     {
         protected readonly ApiWebApplicationFactory<Startup> _factory;
         protected readonly HttpClient _client;
-        protected string _base;
+        protected Uri _baseAddress;
 
         public IntegrationTest(ApiWebApplicationFactory<Startup> factory)
         {
             _factory = factory;
             _client = _factory.CreateClient();
+            _baseAddress = new Uri(_client.BaseAddress.ToString() + "api/ura/users");
         }
     }
 }

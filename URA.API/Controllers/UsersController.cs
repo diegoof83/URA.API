@@ -80,6 +80,8 @@ namespace URA.API.Controllers
 
                 entity.FirstName = updatedEntity.FirstName;
                 entity.LastName = updatedEntity.LastName;
+                entity.Email = updatedEntity.Email;
+                entity.Password = updatedEntity.Password;
 
                 entity = _service.Update(entity);
 
