@@ -137,6 +137,21 @@ namespace URA.API.TESTS
         }
 
         [Theory]
+        [InlineData(1)]
+        public async Task Put_WhenUpdateUserWithDifferentId_ReturnsBadRequest(long id)
+        {
+            //Arrange
+            var requestUri = _baseAddress + "/" + id;
+            var userToUpdate = DbForTestsInitializer.CreateNewUser(2);//create a user if Id different from the user object
+
+            //Act
+            var response = await _client.PutAsJsonAsync(requestUri, userToUpdate);
+
+            //Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Theory]
         [InlineData(3)]
         public async Task Put_WhenUpdateExistingUser_ReturnsOkWithUpdatedUser(long id)
         {

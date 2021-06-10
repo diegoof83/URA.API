@@ -43,7 +43,7 @@ namespace URA.API.Controllers
             var entity = _service.GetById(id);
 
             if (entity == null)
-                return NotFound(new { Message = "Object has been not found." });
+                return NotFound(new { Message = "Object has not been found." });
 
             return Ok(entity);
         }
@@ -73,10 +73,13 @@ namespace URA.API.Controllers
         {
             try
             {
+                if(id != updatedEntity.Id)
+                    return BadRequest();
+
                 var entity = _service.GetById(id);
 
                 if (entity == null)
-                    return NotFound(new { Message = "Object has been not found." });
+                    return NotFound(new { Message = "Object has not been found." });
 
                 entity.FirstName = updatedEntity.FirstName;
                 entity.LastName = updatedEntity.LastName;
@@ -101,7 +104,7 @@ namespace URA.API.Controllers
             var entity = _service.GetById(id);
 
             if (entity == null)
-                return NotFound(new { Message = "Object has been not found." });
+                return NotFound(new { Message = "Object has not been found." });
 
             _service.Delete(entity);
 
