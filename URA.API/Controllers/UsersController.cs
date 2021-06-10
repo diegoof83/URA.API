@@ -38,12 +38,12 @@ namespace URA.API.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<User> Get(long id)
+        public ActionResult<User> GetById(long id)
         {
             var entity = _service.GetById(id);
 
             if (entity == null)
-                return NotFound(new { Message = "Object has been not found." });
+                return NotFound(new { Message = "Object has not been found." });
 
             return Ok(entity);
         }
@@ -73,13 +73,18 @@ namespace URA.API.Controllers
         {
             try
             {
+                if(id != updatedEntity.Id)
+                    return BadRequest();
+
                 var entity = _service.GetById(id);
 
                 if (entity == null)
-                    return NotFound(new { Message = "Object has been not found." });
+                    return NotFound(new { Message = "Object has not been found." });
 
                 entity.FirstName = updatedEntity.FirstName;
                 entity.LastName = updatedEntity.LastName;
+                entity.Email = updatedEntity.Email;
+                entity.Password = updatedEntity.Password;
 
                 entity = _service.Update(entity);
 
@@ -94,16 +99,16 @@ namespace URA.API.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<IEnumerable<User>> Delete(int id)
+        public ActionResult Delete(long id)
         {
             var entity = _service.GetById(id);
 
             if (entity == null)
-                return NotFound(new { Message = "Object has been not found." });
+                return NotFound(new { Message = "Object has not been found." });
 
             _service.Delete(entity);
 
-            return NoContent();
+            return Ok();
         }
     }
 }
