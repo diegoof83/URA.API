@@ -11,7 +11,7 @@ namespace URA.API.Persistence.Repositories
     {
         public IEnumerable<T> GetAll();
 
-        public T GetById(long id);        
+        public T GetById(string id);        
 
         public IEnumerable<T> GetByFilter(Func<T, bool> onFilter);
 

@@ -25,7 +25,7 @@ namespace URA.API.Persistence.Repositories
             return Collection.AsEnumerable<T>();
         }
 
-        public T GetById(long id)
+        public T GetById(string id)
         {
             return Collection.FirstOrDefault(entity => entity.Id == id);
         }

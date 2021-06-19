@@ -25,7 +25,7 @@ namespace URA.API.TESTS
 
             //Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            (await response.Content.ReadAsAsync<IEnumerable<User>>()).Should().HaveCount(3);
+            (await response.Content.ReadAsAsync<IEnumerable<UserProfile>>()).Should().HaveCount(3);
         }
 
         [Theory]
@@ -67,12 +67,12 @@ namespace URA.API.TESTS
 
             //Assert
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
-            (await response.Content.ReadAsAsync<IEnumerable<User>>()).Should().BeEmpty();
+            (await response.Content.ReadAsAsync<IEnumerable<UserProfile>>()).Should().BeEmpty();
         }
 
         [Theory]
-        [InlineData(2)]
-        public async Task Get_WhenItemExists_ReturnsOkWithExpectedItem(long id)
+        [InlineData("2")]
+        public async Task Get_WhenItemExists_ReturnsOkWithExpectedItem(string id)
         {
             //Arrange
             var requestUri = _baseAddress + "/" + id;
@@ -82,7 +82,7 @@ namespace URA.API.TESTS
 
             //Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            var userReturned = await response.Content.ReadAsAsync<User>();
+            var userReturned = await response.Content.ReadAsAsync<UserProfile>();
             userReturned.Should().NotBeNull();
             userReturned.Id.Should().Be(id);
         }
@@ -106,24 +106,23 @@ namespace URA.API.TESTS
         {
             //Arrange
             var requestUri = _baseAddress;
-            var newUser = DbForTestsInitializer.CreateNewUser(0);
+            var newUser = DbForTestsInitializer.CreateNewUser(null);
 
             //Act
             var response = await _client.PostAsJsonAsync(requestUri, newUser);
 
             //Assert
             response.StatusCode.Should().Be(HttpStatusCode.Created);
-            var userReturned = await response.Content.ReadAsAsync<User>();
+            var userReturned = await response.Content.ReadAsAsync<UserProfile>();
             userReturned.Should().NotBeNull();
-            userReturned.Id.Should().NotBe(0);
-            userReturned.Email.Should().BeEquivalentTo(newUser.Email);
+            userReturned.Id.Should().NotBeNull();
             userReturned.FirstName.Should().BeEquivalentTo(newUser.FirstName);
             userReturned.LastName.Should().BeEquivalentTo(newUser.LastName);
         }
 
         [Theory]
-        [InlineData(0)]
-        public async Task Put_WhenUpdateNotExistingUser_ReturnsNotFound(long id)
+        [InlineData(null)]
+        public async Task Put_WhenUpdateNotExistingUser_ReturnsNotFound(string id)
         {
             //Arrange
             var requestUri = _baseAddress + "/" + id;
@@ -137,12 +136,12 @@ namespace URA.API.TESTS
         }
 
         [Theory]
-        [InlineData(1)]
-        public async Task Put_WhenUpdateUserWithDifferentId_ReturnsBadRequest(long id)
+        [InlineData("1")]
+        public async Task Put_WhenUpdateUserWithDifferentId_ReturnsBadRequest(string id)
         {
             //Arrange
             var requestUri = _baseAddress + "/" + id;
-            var userToUpdate = DbForTestsInitializer.CreateNewUser(2);//create a user if Id different from the user object
+            var userToUpdate = DbForTestsInitializer.CreateNewUser("2");//create a user if Id different from the user object
 
             //Act
             var response = await _client.PutAsJsonAsync(requestUri, userToUpdate);
@@ -152,14 +151,13 @@ namespace URA.API.TESTS
         }
 
         [Theory]
-        [InlineData(3)]
-        public async Task Put_WhenUpdateExistingUser_ReturnsOkWithUpdatedUser(long id)
+        [InlineData("3")]
+        public async Task Put_WhenUpdateExistingUser_ReturnsOkWithUpdatedUser(string id)
         {
             //Arrange
             var requestUri = _baseAddress + "/" + id; 
             var existingUser = DbForTestsInitializer.CreateNewUser(id);// creates a user that already exists
-            var userToUpdate = existingUser; //fills the user with new data
-            userToUpdate.Email = "Updated Email";            
+            var userToUpdate = existingUser; //fills the user with new data     
             userToUpdate.FirstName = "Updated First Name";
 
             //Act
@@ -167,10 +165,9 @@ namespace URA.API.TESTS
 
             //Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            var userReturned = await response.Content.ReadAsAsync<User>();
+            var userReturned = await response.Content.ReadAsAsync<UserProfile>();
             userReturned.Should().NotBeNull();
             userReturned.Id.Should().Be(id);
-            userReturned.Email.Should().BeEquivalentTo(userToUpdate.Email);
             userReturned.FirstName.Should().BeEquivalentTo(userToUpdate.FirstName);
             userReturned.LastName.Should().BeEquivalentTo(existingUser.LastName);//Last name was not updated
         }

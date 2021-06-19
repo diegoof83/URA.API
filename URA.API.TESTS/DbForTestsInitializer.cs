@@ -12,13 +12,13 @@ namespace URA.API.TESTS
     {
         public static void Initialize(AppDbContext dbContext)
         {
-            dbContext.Users.AddRange(GetSeedingUsers());
+            dbContext.UserProfiles.AddRange(GetSeedingUsers());
             dbContext.SaveChanges();
         }
 
         public static void Reinitialize(AppDbContext dbContext)
         {
-            dbContext.Users.RemoveRange(dbContext.Users);
+            dbContext.UserProfiles.RemoveRange(dbContext.UserProfiles);
             Initialize(dbContext);
         }
 
@@ -26,13 +26,13 @@ namespace URA.API.TESTS
         /// Create a new list of Users with 3 new Users objects
         /// </summary>
         /// <returns>A list of Users as Enumerable</returns>
-        public static List<User> GetSeedingUsers()
+        public static List<UserProfile> GetSeedingUsers()
         {
-            var users = new List<User>();
+            var users = new List<UserProfile>();
 
             for (int i = 1; i <= 3; i++)
             {
-                users.Add(CreateNewUser(i));
+                users.Add(CreateNewUser(i.ToString()));
             }
 
             return users;
@@ -43,15 +43,13 @@ namespace URA.API.TESTS
         /// </summary>
         /// <param name="id">The User's identification</param>
         /// <returns></returns>
-        public static User CreateNewUser(long id)
+        public static UserProfile CreateNewUser(string id)
         {
             return new()
             {
                 Id = id,
-                Email = "userTest" + id + "@test.com",
                 FirstName = "User" + id,
                 LastName = "Test" + id,
-                Password = "password" + id
             };
         }
     }
