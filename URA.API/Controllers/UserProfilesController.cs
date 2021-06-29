@@ -42,7 +42,7 @@ namespace URA.API.Controllers
         {
             var entity = _service.GetById(id);
 
-            if (entity == null)
+            if (entity is null)
                 return NotFound(new { Message = "Object has not been found." });
 
             return Ok(entity);
@@ -51,17 +51,17 @@ namespace URA.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<UserProfile> Post(UserProfile entity)
+        public async Task<ActionResult<UserProfile>> Post(UserProfile entity)
         {
             try
             {
-                var result = _service.Create(entity);
+                var result = await _service.CreateAsync(entity);
 
                 return new CreatedResult($"/users/{result.Id}", result);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return ValidationProblem(e.Message);
+                return ValidationProblem(ex.Message);
             }
         }
 
@@ -69,28 +69,28 @@ namespace URA.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<UserProfile> Put(string id, UserProfile updatedEntity)
+        public ActionResult<UserProfile> Put(string id, UserProfile userProfile)
         {
             try
             {
-                if(id != updatedEntity.Id)
+                if (id != userProfile.Id)
                     return BadRequest();
 
-                var entity = _service.GetById(id);
+                var existingProfile = _service.GetById(id);
 
-                if (entity == null)
+                if (existingProfile is null)
                     return NotFound(new { Message = "Object has not been found." });
 
-                entity.FirstName = updatedEntity.FirstName;
-                entity.LastName = updatedEntity.LastName;                
+                existingProfile.FirstName = userProfile.FirstName;
+                existingProfile.LastName = userProfile.LastName;                
 
-                entity = _service.Update(entity);
+                existingProfile = _service.Update(existingProfile);
 
-                return Ok(entity);
+                return Ok(existingProfile);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return ValidationProblem(e.Message);
+                return ValidationProblem(ex.Message);
             }
         }
 
@@ -101,7 +101,7 @@ namespace URA.API.Controllers
         {
             var entity = _service.GetById(id);
 
-            if (entity == null)
+            if (entity is null)
                 return NotFound(new { Message = "Object has not been found." });
 
             _service.Delete(entity);

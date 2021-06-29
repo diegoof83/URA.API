@@ -3,15 +3,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using URA.API.Config;
+using URA.API.Domain.Dtos.Requests;
+using URA.API.Domain.Dtos.Responses;
 using URA.API.Domain.Models;
-using URA.API.Domain.Models.Requests;
-using URA.API.Domain.Models.Responses;
 using URA.API.Domain.Services;
 
 namespace URA.API.Controllers
@@ -35,20 +36,20 @@ namespace URA.API.Controllers
         [Route("Register")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Register(UserSignUpRequest userSignUp)
+        public async Task<IActionResult> Register(UserSignUpDto userSignUp)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    var isCreated = _userService.Register(userSignUp);
+                    var isRegistered = _userService.SignUpAsync(userSignUp);
 
-                    if (isCreated.Result.Succeeded)
+                    if (isRegistered.Result.Succeeded)
                     {
-                        var user = await _userService.GetUserByEmail(userSignUp.Email);
+                        var user = await _userService.GetUserByEmailAsync(userSignUp.Email);
                         var jwtToken = GenerateJwtToken(user);
 
-                        return new CreatedResult($"/users/{isCreated.Id}", new RegistrationResponse()
+                        return new CreatedResult($"/users/{isRegistered.Id}", new UserSignUpResponseDto()
                         {
                             Success = true,
                             Token = jwtToken
@@ -56,7 +57,7 @@ namespace URA.API.Controllers
                     }
                     else
                     {
-                        throw new Exception(string.Join("\n", isCreated.Result.Errors.Select(x => x.Description).ToList()));
+                        throw new Exception(string.Join("\n", isRegistered.Result.Errors.Select(x => x.Description).ToList()));
                     }
                 }
                 throw new Exception("Invalid attributes");
@@ -67,59 +68,61 @@ namespace URA.API.Controllers
             }
         }
 
-        //[HttpPost]
-        //[Route("Login")]
-        //public async Task<IActionResult> Loging(UserLoginRequest userLogin)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var existingIdentityUser = await _userManager.FindByEmailAsync(userLogin.Email);
+        [HttpPost]
+        [Route("Login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Login(UserLoginDto userLogin)//TODO Re-factory of this method taking the logic to its service
+        {
+            if (ModelState.IsValid)
+            {
+                var existingUser = await _userService.GetUserByEmailAsync(userLogin.Email);
 
-        //        //verifying if user already exists
-        //        if (existingIdentityUser == null)
-        //        {
-        //            return BadRequest(new RegistrationResponse()
-        //            {
-        //                Erros = new List<string>()
-        //                {
-        //                    "Invalid login request."
-        //                },
-        //                Success = false
-        //            });
-        //        }
+                //verifying if user already exists
+                if (existingUser is null)
+                {
+                    return BadRequest(new UserLoginResponseDto()
+                    {
+                        Erros = new List<string>()
+                        {
+                            "Invalid login request."
+                        },
+                        Success = false
+                    });
+                }
 
-        //        var isPasswordValid = await _userManager.CheckPasswordAsync(existingIdentityUser, userLogin.Password);
+                var isPasswordValid = await _userService.CheckPasswordAsync(existingUser, userLogin.Password);
 
-        //        if (!isPasswordValid)
-        //        {
-        //            return BadRequest(new RegistrationResponse()
-        //            {
-        //                Erros = new List<string>()
-        //                {
-        //                    "Ivalid login request."
-        //                },
-        //                Success = false
-        //            });
-        //        }
+                if (!isPasswordValid)
+                {
+                    return BadRequest(new UserLoginResponseDto()
+                    {
+                        Erros = new List<string>()
+                        {
+                            "Ivalid login request."
+                        },
+                        Success = false
+                    });
+                }
 
-        //        var jwtToken = GenerateJwtToken(existingIdentityUser);
+                var jwtToken = GenerateJwtToken(existingUser);
 
-        //        return Ok(new RegistrationResponse()
-        //        {
-        //            Success = true,
-        //            Token = jwtToken
-        //        });
-        //    }
+                return Ok(new UserLoginResponseDto()
+                {
+                    Success = true,
+                    Token = jwtToken
+                });
+            }
 
-        //    return BadRequest(new RegistrationResponse()
-        //    {
-        //        Erros = new List<string>()
-        //        {
-        //            "Ivalid information(s)."
-        //        },
-        //        Success = false
-        //    });
-        //}
+            return BadRequest(new UserLoginResponseDto()
+            {
+                Erros = new List<string>()
+                {
+                    "Ivalid information(s)."
+                },
+                Success = false
+            });
+        }
 
         private string GenerateJwtToken(User user)
         {

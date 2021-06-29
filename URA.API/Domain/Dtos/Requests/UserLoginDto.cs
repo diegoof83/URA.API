@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace URA.API.Domain.Models.Requests
+namespace URA.API.Domain.Dtos.Requests
 {
-    public class UserLoginRequest
+    public class UserLoginDto
     {
         [Required]
         [EmailAddress]

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using URA.API.Domain.Filters;
@@ -45,9 +44,9 @@ namespace URA.API.Services
             return _repository.GetByFilter(Expression.Lambda<Func<UserProfile,bool>>(expression).Compile());
         }
 
-        public UserProfile Create(UserProfile entity)
+        public async Task<UserProfile> CreateAsync(UserProfile entity)
         {
-            return _repository.Create(entity);
+            return await _repository.CreateAsync(entity);
         }
 
         public UserProfile Update(UserProfile entity)

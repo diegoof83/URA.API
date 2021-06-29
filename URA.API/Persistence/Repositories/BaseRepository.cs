@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using URA.API.Domain.Models;
 using URA.API.Persistence.Contexts;
@@ -27,7 +26,7 @@ namespace URA.API.Persistence.Repositories
 
         public T GetById(string id)
         {
-            return Collection.FirstOrDefault(entity => entity.Id == id);
+            return Collection.Where(entity => entity.Id == id).SingleOrDefault();
         }
         
         public IEnumerable<T> GetByFilter(Func<T, bool> onFilter)
@@ -35,10 +34,10 @@ namespace URA.API.Persistence.Repositories
             return Collection.Where(onFilter).AsEnumerable();
         }
 
-        public T Create(T entity)
+        public async Task<T> CreateAsync(T entity)
         {
             entity = Collection.Add(entity).Entity;
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             return entity;
         }

@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using URA.API.Domain.Models;
 
-namespace URA.API.Domain.Models.Requests
+namespace URA.API.Domain.Dtos.Requests
 {
-    public class UserSignUpRequest
+    public class UserSignUpDto
     {
         [Required]
         public string FirstName { get; set; }
+
+        [Required]
         public string LastName { get; set; }
 
         [EmailAddress]
@@ -19,7 +18,7 @@ namespace URA.API.Domain.Models.Requests
         [Required]
         public string Password { get; set; }
 
-        public User ToUser()
+        public User AsUser()
         {
             return new User
             {
@@ -29,15 +28,15 @@ namespace URA.API.Domain.Models.Requests
             };
         }
 
-        public User ToUser(string id)
+        public User AsUser(string id)
         {
-            var user = ToUser();
+            var user = AsUser();
             user.Id = id;
 
             return user;
         }
 
-        public UserProfile ToUserProfile(string userId)
+        public UserProfile AsUserProfile(string userId)
         {
             return new UserProfile
             {

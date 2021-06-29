@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
+using URA.API.Domain.Dtos.Requests;
 using URA.API.Domain.Models;
-using URA.API.Domain.Models.Requests;
 using URA.API.Domain.Services;
 
 namespace URA.API.Services
@@ -19,8 +16,8 @@ namespace URA.API.Services
             _userManager = userManager;
             _userProfilesService = userProfilesService;
         }
-                
-        public async Task<IdentityResult> Register(UserSignUpRequest userSignUp)
+
+        public async Task<IdentityResult> SignUpAsync(UserSignUpDto userSignUp)
         {
             IdentityResult isCreated;
 
@@ -34,12 +31,11 @@ namespace URA.API.Services
                     //TODO create a new exception UserAlreadyExistsException
                 }
 
-                var newUser = userSignUp.ToUser();
+                var newUser = userSignUp.AsUser();
                 isCreated = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
 
-                var newUserProfile = userSignUp.ToUserProfile(newUser.Id);
-
-                _userProfilesService.Create(newUserProfile);
+                var newUserProfile = userSignUp.AsUserProfile(newUser.Id);
+                newUserProfile = await _userProfilesService.CreateAsync(newUserProfile);
 
                 scope.Complete();
             }
@@ -47,11 +43,18 @@ namespace URA.API.Services
             return isCreated;
         }
 
-        public async Task<User> GetUserByEmail(string email)
+        public async Task<User> GetUserByEmailAsync(string email)
         {
-            var existingIdentityUser = await _userManager.FindByEmailAsync(email);
+            var existingUser = await _userManager.FindByEmailAsync(email);
 
-            return existingIdentityUser;
+            return existingUser;
+        }
+
+        public async Task<bool> CheckPasswordAsync(User user, string password)
+        {
+            var isPasswordChecked = await _userManager.CheckPasswordAsync(user, password);
+
+            return isPasswordChecked;
         }
     }
 }

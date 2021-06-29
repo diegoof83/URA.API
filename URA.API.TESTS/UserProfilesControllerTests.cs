@@ -8,9 +8,9 @@ using Xunit;
 
 namespace URA.API.TESTS
 {
-    public class UsersControllerTests : IntegrationTest
+    public class UserProfilesControllerTests : IntegrationTest
     {
-        public UsersControllerTests(ApiWebApplicationFactory<Startup> factory) : base(factory)
+        public UserProfilesControllerTests(ApiWebApplicationFactory<Startup> factory) : base(factory)
         {
         }
 
