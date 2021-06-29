@@ -11,11 +11,11 @@ namespace URA.API.Controllers
 {
     [ApiController]
     [Route("api/ura/[controller]")]
-    public class UsersController : ControllerBase
+    public class UserProfilesController : ControllerBase
     {
-        private readonly IUsersService _service;
+        private readonly IUserProfilesService _service;
 
-        public UsersController(IUsersService service)
+        public UserProfilesController(IUserProfilesService service)
         {
             _service = service;
         }
@@ -23,7 +23,7 @@ namespace URA.API.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public ActionResult<IEnumerable<User>> GetAll()
+        public ActionResult<IEnumerable<UserProfile>> GetAll()
         {
             var result = _service.GetAll();
 
@@ -38,11 +38,11 @@ namespace URA.API.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<User> GetById(long id)
+        public ActionResult<UserProfile> GetById(string id)
         {
             var entity = _service.GetById(id);
 
-            if (entity == null)
+            if (entity is null)
                 return NotFound(new { Message = "Object has not been found." });
 
             return Ok(entity);
@@ -51,17 +51,17 @@ namespace URA.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<User> Post(User entity)
+        public async Task<ActionResult<UserProfile>> Post(UserProfile entity)
         {
             try
             {
-                var result = _service.Create(entity);
+                var result = await _service.CreateAsync(entity);
 
                 return new CreatedResult($"/users/{result.Id}", result);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return ValidationProblem(e.Message);
+                return ValidationProblem(ex.Message);
             }
         }
 
@@ -69,41 +69,39 @@ namespace URA.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<User> Put(long id, User updatedEntity)
+        public ActionResult<UserProfile> Put(string id, UserProfile userProfile)
         {
             try
             {
-                if(id != updatedEntity.Id)
+                if (id != userProfile.Id)
                     return BadRequest();
 
-                var entity = _service.GetById(id);
+                var existingProfile = _service.GetById(id);
 
-                if (entity == null)
+                if (existingProfile is null)
                     return NotFound(new { Message = "Object has not been found." });
 
-                entity.FirstName = updatedEntity.FirstName;
-                entity.LastName = updatedEntity.LastName;
-                entity.Email = updatedEntity.Email;
-                entity.Password = updatedEntity.Password;
+                existingProfile.FirstName = userProfile.FirstName;
+                existingProfile.LastName = userProfile.LastName;                
 
-                entity = _service.Update(entity);
+                existingProfile = _service.Update(existingProfile);
 
-                return Ok(entity);
+                return Ok(existingProfile);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return ValidationProblem(e.Message);
+                return ValidationProblem(ex.Message);
             }
         }
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult Delete(long id)
+        public ActionResult Delete(string id)
         {
             var entity = _service.GetById(id);
 
-            if (entity == null)
+            if (entity is null)
                 return NotFound(new { Message = "Object has not been found." });
 
             _service.Delete(entity);
