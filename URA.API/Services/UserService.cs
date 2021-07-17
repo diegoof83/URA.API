@@ -21,7 +21,8 @@ namespace URA.API.Services
         {
             IdentityResult isCreated;
 
-            using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.Serializable }))
+            //open a transaction 
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))       
             {
                 var existingUser = await _userManager.FindByEmailAsync(userSignUp.Email);
 
