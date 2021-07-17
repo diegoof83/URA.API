@@ -42,14 +42,14 @@ namespace URA.API.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var isRegistered = _userService.SignUpAsync(userSignUp);
+                    var isRegistered = await _userService.SignUpAsync(userSignUp);
 
-                    if (isRegistered.Result.Succeeded)
+                    if (isRegistered.Succeeded)
                     {
                         var user = await _userService.GetUserByEmailAsync(userSignUp.Email);
                         var jwtToken = GenerateJwtToken(user);
 
-                        return new CreatedResult($"/users/{isRegistered.Id}", new UserSignUpResponseDto()
+                        return new CreatedResult($"/users/{user.Id}", new UserSignUpResponseDto()
                         {
                             Success = true,
                             Token = jwtToken
@@ -57,7 +57,7 @@ namespace URA.API.Controllers
                     }
                     else
                     {
-                        throw new Exception(string.Join("\n", isRegistered.Result.Errors.Select(x => x.Description).ToList()));
+                        throw new Exception(string.Join("\n", isRegistered.Errors.Select(x => x.Description).ToList()));
                     }
                 }
                 throw new Exception("Invalid attributes");
