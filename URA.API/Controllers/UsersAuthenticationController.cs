@@ -40,6 +40,7 @@ namespace URA.API.Controllers
         {
             try
             {
+                // Check if the incoming request is valid
                 if (ModelState.IsValid)
                 {
                     var isRegistered = await _userService.SignUpAsync(userSignUp);
@@ -74,11 +75,12 @@ namespace URA.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Login(UserLoginDto userLogin)//TODO Re-factory of this method taking the logic to its service
         {
+            // Check if the incoming request is valid
             if (ModelState.IsValid)
             {
                 var existingUser = await _userService.GetUserByEmailAsync(userLogin.Email);
-
-                //verifying if user already exists
+                
+                //verifying if the email(user) already exists
                 if (existingUser is null)
                 {
                     return BadRequest(new UserLoginResponseDto()
@@ -90,16 +92,17 @@ namespace URA.API.Controllers
                         Success = false
                     });
                 }
-
+                                
                 var isPasswordValid = await _userService.CheckPasswordAsync(existingUser, userLogin.Password);
 
+                // Checking if the user has inputed the right password
                 if (!isPasswordValid)
                 {
                     return BadRequest(new UserLoginResponseDto()
                     {
                         Erros = new List<string>()
                         {
-                            "Ivalid login request."
+                            "Invalid login request."
                         },
                         Success = false
                     });
@@ -118,7 +121,7 @@ namespace URA.API.Controllers
             {
                 Erros = new List<string>()
                 {
-                    "Ivalid information(s)."
+                    "Invalid information(s)."
                 },
                 Success = false
             });

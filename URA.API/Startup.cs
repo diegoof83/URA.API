@@ -8,8 +8,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
 using System.Text;
 using URA.API.Config;
+using URA.API.Config.Attributes;
 using URA.API.Domain.Models;
 using URA.API.Domain.Services;
 using URA.API.Persistence.Contexts;
@@ -25,24 +27,26 @@ namespace URA.API
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-        }       
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
-            
-            services.AddDbContext<AppDbContext>(options => 
+
+            services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")
                 ));
 
             services.AddControllers();
 
-            services.AddAuthentication(options => {
+            services.AddAuthentication(options =>
+            {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(jwt => {
+            }).AddJwtBearer(jwt =>
+            {
                 var key = Encoding.ASCII.GetBytes(Configuration["JwtConfig:Secret"]);
 
                 jwt.SaveToken = true;
@@ -62,15 +66,30 @@ namespace URA.API
 
             services.AddScoped<IBaseRepository<UserProfile>, UserProfilesRepository>();
             services.AddScoped<IBaseRepository<User>, UsersRepository>();
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IUserProfilesService, UserProfilesService>();
+            AddScopeWithInterceptor<IUserProfilesService, UserProfilesService>(services);
+            AddScopeWithInterceptor<IUserService, UserService>(services);
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "URA.API", Version = "v1" });
             });
         }
-                
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="Interface"></typeparam>
+        /// <typeparam name="Implementation"></typeparam>
+        /// <typeparam name="Interceptor"></typeparam>
+        /// <param name="services"></param>
+        private static void AddScopeWithInterceptor<Interface, Implementation>(IServiceCollection services)
+            where Interface : class
+            where Implementation : class
+        {
+            services.AddScoped<Interface>(provider => TransactionalInteceptor<Interface>.Create(provider.GetRequiredService<Implementation>() as Interface));
+            services.AddScoped<Implementation>();
+        }
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
