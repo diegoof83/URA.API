@@ -5,3 +5,4 @@ User Registration/Authentication RESTful web service.
 * MS SQL Server.
 * Integration Test using a custon WebApplicationFactory.
 * Jwt(Json Web Token) Authentication.
+* Attributes, Interceptor and Proxy Patterns.
