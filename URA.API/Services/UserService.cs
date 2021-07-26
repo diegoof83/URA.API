@@ -21,25 +21,19 @@ namespace URA.API.Services
         {
             IdentityResult isCreated;
 
-            //open a transaction 
-            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))       
+            var existingUser = await _userManager.FindByEmailAsync(userSignUp.Email);
+
+            //verifying if the email(user) already exists
+            if (existingUser != null)
             {
-                var existingUser = await _userManager.FindByEmailAsync(userSignUp.Email);
-
-                //verifying if the email already exists
-                if (existingUser != null)
-                {
-                    //TODO create a new exception UserAlreadyExistsException
-                }
-
-                var newUser = userSignUp.AsUser();
-                isCreated = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
-
-                var newUserProfile = userSignUp.AsUserProfile(newUser.Id);
-                newUserProfile = await _userProfilesService.CreateAsync(newUserProfile);
-
-                scope.Complete();
+                //TODO create a new exception UserAlreadyExistsException
             }
+
+            var newUser = userSignUp.AsUser();
+            isCreated = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
+
+            var newUserProfile = userSignUp.AsUserProfile(newUser.Id);
+            newUserProfile = await _userProfilesService.CreateAsync(newUserProfile);
 
             return isCreated;
         }
